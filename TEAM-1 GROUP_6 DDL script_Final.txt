@@ -1,0 +1,99 @@
+TEAM-1 GROUP_6
+ 
+DDL Script : 
+                                            
+CREATE TABLE Users (
+    UID VARCHAR(10) PRIMARY KEY,
+    Name VARCHAR(20),
+    Email VARCHAR(20) UNIQUE,
+    DOB DATE,
+    Password VARCHAR(20)
+);
+
+CREATE TABLE Student (
+    StudentID VARCHAR(10) PRIMARY KEY,
+    Program VARCHAR(5),
+    Batch INTEGER,
+	Branch VARCHAR(10),
+    CPI REAL,
+    FOREIGN KEY (StudentID) REFERENCES Users(UID)
+);
+
+CREATE TABLE Professor (
+    ProfID VARCHAR(10) PRIMARY KEY,
+    FacultyRoom VARCHAR(3),
+    FOREIGN KEY (ProfID) REFERENCES Users(UID)
+);
+
+CREATE TABLE Course (
+    CourseID VARCHAR(5) PRIMARY KEY,
+    CourseName VARCHAR(30),
+    Branch VARCHAR(10),
+    Credits INTEGER,
+    Lecture INTEGER,
+    Tutorial BOOLEAN,
+    Labs BOOLEAN,
+    Material TEXT
+);
+
+CREATE TABLE Offered (
+    CourseID VARCHAR(5),
+    ProfID VARCHAR(10),
+    Year INTEGER,
+    Semester INTEGER,
+    Intake INTEGER,
+    PRIMARY KEY (CourseID, ProfID, Year, Semester),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
+    FOREIGN KEY (ProfID) REFERENCES Professor(ProfID)
+);
+
+CREATE TABLE Prerequisite (
+    CourseID VARCHAR(5),
+    Preq_CourseID VARCHAR(5),
+    PRIMARY KEY (CourseID, Preq_CourseID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
+    FOREIGN KEY (Preq_CourseID) REFERENCES Course(CourseID)
+);
+
+CREATE TABLE Enrollment (
+    StudentID VARCHAR(10),
+    CourseID VARCHAR(5),
+    GradeReceived VARCHAR(2),
+    PRIMARY KEY (StudentID, CourseID),
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
+
+CREATE TABLE Skills (
+    Skill_ID VARCHAR(5) PRIMARY KEY,
+    Skill_name VARCHAR(40)
+);
+
+CREATE TABLE Required (
+    Skill_ID VARCHAR(5),
+    CourseID VARCHAR(5),
+    PRIMARY KEY (Skill_ID, CourseID),
+    FOREIGN KEY (Skill_ID) REFERENCES Skills(Skill_ID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
+
+CREATE TABLE Professor_Specialization (
+    ProfID VARCHAR(10),
+    Specialization TEXT,
+    PRIMARY KEY (ProfID, Specialization),
+    FOREIGN KEY (ProfID) REFERENCES Professor(ProfID)
+);
+
+CREATE TABLE Rating (
+    StudentID VARCHAR(10),
+    ProfID VARCHAR(10),
+    CourseID VARCHAR(5),
+    Course_Difficulty INTEGER,
+    Tutorial_Lab_Difficulty INTEGER,
+    Project_Difficulty INTEGER,
+    Overall_Rating INTEGER,
+    PRIMARY KEY (StudentID, ProfID, CourseID),
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (ProfID) REFERENCES Professor(ProfID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);

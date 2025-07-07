@@ -1,0 +1,290 @@
+--Team 1 Group 6
+
+--SQL QUERIES
+
+--Insert a new elective course into the database
+INSERT INTO Course (CourseID, CourseName, liranch, Credits, Lecture, Tutorial, Labs, Material) VALUES ('CSESI', 'Data Science', 'CSE', 4, 3, TRUE, TRUE, 'Naterial content here');
+
+--Update the details of an existing elective course
+UPDATE Course
+SET CourseName ='Advanced Data Science',
+Credits = 5,
+Material = 'Updated material content'
+WHERE CourseID = 'CSE01';
+
+--Delete an elective course from the database
+DELETE FROM COURSE WHERE COURSEID = 'CS201'
+
+--Retrieve a list of all elective courses
+SELECT * FROM COURSE;
+
+--Retrieve details of a specific elective course by course ID
+SELECT * FROM COURSE
+WHERE COURSEID = 'GT01';
+
+--Find all elective courses with a specific credit count
+SELECT * FROM COURSE
+WHERE CREDITS = 4;
+
+--Find all elective courses offered by a specific department (Branch)
+SELECT * FROM COURSE
+WHERE BRANCH = 'MNC';
+
+--STUDENT ENROLMENT QUERIES
+--Enroll a student in an elective course
+INSERT INTO Enrollment (StudentID, CourseID, GradeReceived) VALUES ('202101001', 'ΑΑ02', NULL);
+
+--Remove a student from an elective course
+DELETE FROM Enrollment
+WHERE StudentID = '202101001' AND CourseID = 'GT01';
+
+--Retrieve all courses a specific student has registered for
+SELECT c.CourseID, c. CourseName, e. GradeReceived FROM Enrollment e
+JOIN Course c ON e. CourseID = c. CourseID WHERE e. StudentID = '202101002';
+
+--Find the number of students enrolled in a specific elective course
+SELECT c.CourseName, COUNT (e. Student ID) AS EnrollmentCount FROM Enrollment e
+JOIN Course c ON e. CourseID = c.CourseID
+WHERE e.CourseID = 'GT01'
+GROUP BY c.CourseName;
+
+--Find all students enrolled in a specific elective course
+SELECT u. Name AS StudentName, s. Student ID FROM Enrollment e
+JOIN Student s ON e. StudentID = s. StudentID
+JOIN Users u ON s.StudentID = u.UID
+WHERE e.CourseID = 'GT01';
+
+--Retrieve all elective courses available for a particular semester
+SELECT u. Name AS StudentName, s.StudentID FROM Student s
+JOIN Users u ON s. StudentID = u.UID
+LEFT JOIN Enrollment e ON s.StudentID = e. StudentID
+WHERE e. StudentID IS NULL;
+
+--Retrieve students who have not enrolled in any elective course
+INSERT INTO Offered (CourseID, ProfID, Year, Semester, Intake)
+VALUES ('AA02', 'MAJO', 2024, 1, 60);
+
+--Faculty Related Queries:
+--Assign an instructor to a specific elective course
+SELECT c.CourseID, c.CourseName, o. Year, o. Semester FROM Offered o
+JOIN Course c ON o. CourseID c. CourseID
+WHERE o. ProfID = 'MAJO';
+
+--Find the instructor assigned to a specific elective course.
+SELECT u. Name AS ProfessorName
+FROM Offered o
+JOIN Professor p ON o. ProfID p.ProfID
+JOIN Users u ON p.ProfID = u.UID
+WHERE o. CourseID = 'GT01' AND o. Year 2024 AND o. Semester = 1;
+
+--Find all elective courses that do not have an assigned instructor
+SELECT c. CourseID, c.CourseName
+FROM Course c
+LEFT JOIN Offered o ON c.CourseID = o. CourseID
+WHERE o. ProfID IS NULL;
+
+--Retrieve a list of instructors who have not been assigned any elective courses
+SELECT u. Name AS Professor Name
+FROM Professor p
+JOIN Users u ON p.ProfID = u.UID
+LEFT JOIN Offered o ON p.ProfID o. ProfID
+WHERE o. ProfID IS NULL;
+
+--Course Related Queries:
+--Retrieve the total number of elective courses offered in a semester
+SELECT COUNT (DISTINCT CourseID) AS TotalElectiveCourses FROM Offered
+WHERE Year 2024 AND Semester = 1;
+
+--Retrieve the total number of students enrolled in electives across all departments
+SELECT COUNT (DISTINCT StudentID) AS TotalStudentsEnrolled FROM Enrollment;
+
+--Retrieve the average number of students per elective course.
+SELECT ROUND (AVG (student_count), 0) AS AvgStudentsPerCourse FROM (
+SELECT CourseID, COUNT (StudentID) AS student_count
+FROM Enrollment
+GROUP BY CourseID
+) AS course_enrollments;
+
+--Find students who have registered for the maximum number of electives allowed
+SELECT s. StudentID, u. Name, COUNT (e. CourseID) AS Electives Taken FROM Enrollment e
+JOIN Student s ON e. StudentID s.StudentID
+JOIN Users u ON s.StudentID = u.UID
+GROUP BY s. StudentID, u. Name
+ORDER BY ElectivesTaken DESC
+LIMIT 10;
+
+--List course with labs / tutorials
+SELECT CourseID,CourseName,CASE 
+WHEN Tutorial THEN 'Yes' ELSE 'No' END AS HasTutorial, CASE WHEN Labs THEN 'Yes' ELSE 'No' END AS HasLab
+FROM Course
+WHERE Tutorial TRUE OR Labs = TRUE;
+
+--Rating Related Queries
+--Top rated course with professor list in a particular semester and year
+SELECT
+c.CourseName,
+p.Name AS ProfessorName,
+ROUND (AVG(r.Overall_Rating):: numeric, 2) AS AverageRating
+FROM Rating r
+JOIN Course c ON r.CourseID = c.CourseID
+JOIN Professor pr ON r.ProfID pr.ProfID
+JOIN Users p ON pr. ProfID = P.UID
+JOIN Offered o ON r.CourseID = o. CourseID AND r.ProfID = o. ProfID
+WHERE o. Year 2023 AND o. Semester = 1
+GROUP BY c.CourseName, p. Name
+ORDER BY Average Rating DESC
+LIMIT 2;
+
+--Most Difficult Course List
+SELECT
+c.CourseName,
+ROUND (AVG(r.Course_Difficulty)::numeric, 2) AS AvgDifficulty
+FROM Rating r
+JOIN Course c ON r.CourseID = c.CourseID
+GROUP BY c.CourseName
+ORDER BY AvgDifficulty DESC
+LIMIT 10;
+
+--Most Useful Courses
+SELECT c.CourseName, COUNT (p. CourseID) AS NumOfDependentCourses
+FROM Prerequisite p
+JOIN Course c ON p.Preq_CourseID = c.CourseID
+GROUP BY c. CourseName
+ORDER BY NumOfDependentCourses DESC
+LIMIT 5;
+
+--Course offering average grade above 8
+SELECT
+c.CourseName, ROUND (AVG (
+CASE
+WHEN e.Grade Received = 'AA' THEN 10
+WHEN e.GradeReceived = 'AB' THEN 9
+WHEN e.GradeReceived = 'BB' THEN 8
+WHEN e. GradeReceived 'BC'
+THEN 7
+WHEN e.GradeReceived = 'CC' THEN 6
+WHEN e.GradeReceived 'CD'
+THEN 5
+WHEN e.GradeReceived 'DD' THEN 4
+WHEN e. GradeReceived = 'DE' THEN 3
+WHEN e.GradeReceived = 'F' THEN 0
+ELSE NULL
+END
+)::numeric, 2) AS AvgGrade
+FROM Enrollment e
+JOIN Course c ON e. CourseID c.CourseID
+GROUP BY c.CourseName
+HAVING AVG (
+CASE
+WHEN e.adeReceived = 'AA' THEN 10
+WHEN e.GradeReceived = 'AB' THEN 9
+WHEN e.GradeReceived 'BB' THEN 8
+WHEN e.Grade Received 'BC' THEN 7
+WHEN e.GradeReceived = 'CC' THEN 6
+WHEN e.GradeReceived = 'CD' THEN 5
+WHEN e.GradeReceived = 'DD' THEN 4
+WHEN e.Grade Received = 'DE' THEN 3
+WHEN e.GradeReceived = 'F' THEN 0
+ELSE NULL
+END
+) > 8
+ORDER BY AvgGrade DESC;
+
+--All ratings given by a particular student
+SELECT c.CourseName, u.Name AS ProfessorName,
+r.Course_Difficulty, r. Tutorial_Lab_Difficulty,
+r.Project_Difficulty, r.Overall_Rating
+FROM Rating r
+JOIN Course c ON r.CourseID = c.CourseID
+JOIN Professor p ON r.ProfID p.ProfID
+JOIN Users u ON p.ProfID = u.UID
+WHERE r.StudentID = '202101001'
+ORDER BY r.Overall_Rating DESC;
+
+--All ratings of a particular course with its average rating
+SELECT
+c.CourseName,
+u. Name AS ProfessorName,
+r.Course_Difficulty,
+r.Tutorial_Lab_Difficulty,
+r.Project_Difficulty,
+r.Overall_Rating
+FROM Rating r
+JOIN Course c ON r. CourseID = c.CourseID
+JOIN Professor p ON r. ProfID = p. ProfID
+JOIN Users u ON p.ProfID = u.UID
+WHERE r. CourseID = 'GT01'
+UNION ALL
+Average rating for course GT01 (rounded to 2 decimal places)
+SELECT
+'Average for GT01' AS CourseName,
+NULL AS ProfessorName,
+NULL AS Course_Difficulty,
+NULL AS Tutorial_Lab_Difficulty,
+NULL AS Project_Difficulty,
+ROUND (AVG (Overall_Rating)::numeric, 2) AS Overall_Rating
+FROM Rating
+WHERE CourseID = 'GT01'
+ORDER BY ProfessorName NULLS LAST;
+
+--Three most loved professors
+SELECT
+u. Name AS ProfessorName,
+ROUND (AVG(r.Overall_Rating):: numeric, 2) AS AvgRating
+FROM Rating r
+JOIN Professor p ON r. ProfID = P. ProfID
+JOIN Users u ON p.ProfID u.UID
+GROUP BY u.Name
+ORDER BY AvgRating DESC
+LIMIT 3;
+
+--Number of students with a particular grade in a specified course
+SELECT
+GradeReceived,
+COUNT(*) AS NumberOfStudents
+FROM Enrollment
+WHERE CourseID = 'GT01' AND GradeReceived IS NOT NULL
+GROUP BY GradeReceived
+ORDER BY
+CASE
+WHEN GradeReceived = 'AA' THEN 1
+WHEN GradeReceived = 'AB' THEN 2
+WHEN GradeReceived = 'BB' THEN 3
+WHEN GradeReceived = 'BC' THEN 4
+WHEN GradeReceived = 'CC' THEN 5
+WHEN GradeReceived = 'CD' THEN 6
+WHEN GradeReceived = 'DD' THEN 7
+WHEN GradeReceived = 'DE' THEN 8
+WHEN GradeReceived = 'F' THEN 9
+ELSE 10
+END;
+
+--SKILLS and PreRequisite Related Queries 
+--Skills acquired from a particular course
+SELECT s. Skill_name
+FROM Required r
+JOIN Skills s ON r.Skill_ID = s.Skill_ID
+WHERE r.CourseID = 'GT01';
+
+--Prerequisite required for a particular course
+SELECT c.CourseName
+FROM Prerequisite p
+JOIN Course c ON p.Preq_CourseID = c.CourseID
+WHERE p.CourseID = 'AA02';
+
+--List Courses based on Particular Skill
+SELECT c.CourseName
+FROM Required r
+JOIN Course c ON r.CourseID = c.CourseID
+JOIN Skills s ON r.Skill_ID = s.Skill_ID
+WHERE s.Skill_name = 'Algorithm Design';
+
+--Specialization Related Queries
+--Professors with most specialization
+SELECT u. Name AS ProfessorName, COUNT(ps.Specialization) AS NumOfSpecializations
+FROM Professor Specialization ps
+JOIN Professor p ON ps.ProfID p.ProfID
+JOIN Users u ON p.ProfID U.UID
+GROUP BY u. Name
+ORDER BY NumOfSpecializations DESC
+LIMIT 5;
