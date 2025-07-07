@@ -13,8 +13,6 @@ The **Electives Database Management System** aims to simplify this process by pr
 
 It ensures **data-driven decision-making**, reducing uncertainty and helping students choose electives that align with their interests and academic goals.
 
-🔗 Website: `electivegateway.daiict.ac.in`
-
 ---
 
 ## 👥 Users
@@ -109,12 +107,8 @@ It ensures **data-driven decision-making**, reducing uncertainty and helping stu
 
 ---
 
-## 👥 Contributors
-
-**Group 1**  
-- Kalp Shah - 202301481 (Group Representative - 9727187709)  
-- Sujal Prajapati - 202301478  
+## 👥 Contributors (Name - StudentID)
 - Vraj Parikh - 202301440  
-
-Course: **IT214 - LAB G6**
+- Kalp Shah - 202301481
+- Sujal Prajapati - 202301478  
 
